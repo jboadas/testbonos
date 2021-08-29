@@ -1,0 +1,12 @@
+curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/users/
+
+curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/bonos/
+
+curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/bonos/4/
+
+curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/bonos/4/comprabono/
+
+curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/bonos/4/preciousd/
+
+Token banxico
+998e9ae2587c2e90d01c616faad0fa854d14fee0ae00e48c44d4dbcf90612c12

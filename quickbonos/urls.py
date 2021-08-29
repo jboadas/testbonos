@@ -26,7 +26,6 @@ from quickbonos.mainbonos import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
 router.register(r'bonos', views.BonosViewSet)
 
 # Wire up our API using automatic URL routing.
