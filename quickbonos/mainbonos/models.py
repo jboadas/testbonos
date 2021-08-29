@@ -13,13 +13,18 @@ class Bonos(models.Model):
     bono_id = models.AutoField(primary_key=True)
     bono_name = models.CharField(
         max_length=40,
-        validators=[MinLengthValidator(4)],
+        validators=[MinLengthValidator(3)],
         blank=False)
     bono_number = models.IntegerField(
         validators=[
             MinValueValidator(1),
             MaxValueValidator(10000)])
-    bono_price = models.DecimalField(max_digits=9, decimal_places=4)
+    bono_price = models.DecimalField(
+        max_digits=13,
+        decimal_places=4,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(100000000)])
     created_by = models.ForeignKey(
         User,
         null=False,

@@ -4,7 +4,8 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from quickbonos.mainbonos.serializers import (
     UserSerializer,
-    BonosSerializer)
+    BonosSerializer,
+    BonosCreateSerializer)
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,6 +26,16 @@ class BonosViewSet(viewsets.ModelViewSet):
     queryset = Bonos.objects.all()
     serializer_class = BonosSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'post']
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return BonosCreateSerializer
+        return BonosSerializer
+
+    def perform_create(self, serializer):
+        self.serializer_class = BonosCreateSerializer
+        serializer.save(created_by=self.request.user)
 
     def call_banxico_api(self):
         url = 'https://www.banxico.org.mx/SieAPIRest/service/v1/series/SF43718/datos/oportuno'
@@ -57,10 +68,19 @@ class BonosViewSet(viewsets.ModelViewSet):
         user = User.objects.get(username=request.user.username)
         bono = super(BonosViewSet, self).get_object()
         if not bono.bought_by:
-            bono.bought_by = user
-            bono.save()
-        custom_response = {"comprabono": request.user.id}
-        return Response(custom_response, status=status.HTTP_200_OK)
+            if bono.created_by != user:
+                bono.bought_by = user
+                bono.save()
+                custom_response = {"buy": "success"}
+                return Response(custom_response, status=status.HTTP_200_OK)
+            else:
+                custom_response = {"error": "failed to buy own product"}
+                return Response(
+                    custom_response,
+                    status=status.HTTP_404_NOT_FOUND)
+        else:
+            custom_response = {"error": "Not available already sold"}
+            return Response(custom_response, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['get'], url_path='preciousd')
     def precio_usd(self, request, *args, **kwargs):

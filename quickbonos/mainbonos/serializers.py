@@ -15,13 +15,30 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         return user
 
 
+class BonosCreateSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Bonos
+        fields = [
+            'url',
+            'bono_name',
+            'bono_number',
+            'bono_price',
+            'created_by',
+            'bought_by']
+
+
 class BonosSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Bonos
-        fields = '__all__'
+        fields = [
+            'url',
+            'bono_name',
+            'bono_number',
+            'bono_price']
 
-    def create(self, validated_data):
-        bono = super().create(validated_data)
-        bono.created_by = self.context['request'].user
-        bono.save()
-        return bono
+
+    # def create(self, validated_data):
+    #     bono = super().create(validated_data)
+    #     bono.created_by = self.context['request'].user
+    #     bono.save()
+    #     return bono

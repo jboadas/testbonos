@@ -8,5 +8,12 @@ curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0
 
 curl -H 'Accept: application/json; indent=4' -u admin:password123 http://127.0.0.1:8000/bonos/4/preciousd/
 
+curl -H 'Accept: application/json; indent=4' -u admin:password123 \
+--request POST \
+--data '{"bono_name":"xyz","bono_number":5000, "bono_price":9999.99}' \
+http://127.0.0.1:8000/bonos/
+
+curl -H 'Accept: application/json; indent=4' -u admin:password123 -F 'bono_name=ADMDOS' -F 'bono_number=5000' -F 'bono_price=9999.99' -F 'created_by=1' http://127.0.0.1:8000/bonos/
+
 Token banxico
 998e9ae2587c2e90d01c616faad0fa854d14fee0ae00e48c44d4dbcf90612c12
