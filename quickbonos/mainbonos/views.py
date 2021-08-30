@@ -88,7 +88,10 @@ class BonosViewSet(viewsets.ModelViewSet):
         if exchange_rate != 0:
             bono = super(BonosViewSet, self).get_object()
             price_usd = bono.bono_price / exchange_rate
-            custom_response = {"USD": str(price_usd), "MXN": bono.bono_price}
+            custom_response = {
+                "USD": str(price_usd),
+                "MXN": bono.bono_price,
+                "RATE": str(exchange_rate)}
             return Response(custom_response, status=status.HTTP_200_OK)
         else:
             custom_response = {"error": "cannot access banxico api"}

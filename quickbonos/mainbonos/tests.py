@@ -12,6 +12,12 @@ class BonosTestCase(TestCase):
         )
         user.set_password('testpassword')
         user.save()
+        user = User(
+            username='testuser2',
+            email='testuser2@localhost.com'
+        )
+        user.set_password('testpassword2')
+        user.save()
 
     def test_create_bono(self):
 
@@ -194,5 +200,75 @@ class BonosTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(bono_name, 'tnsp02')
 
-        # print(response.content)
-        # print(response.status_code)
+    def test_buy_bonds(self):
+
+        client = APIClient()
+        client.login(username='testuser', password='testpassword')
+        response = client.post(
+            '/bonos/',
+            {
+                'bono_name': 'test_buy_bonds',
+                'bono_number': '1',
+                'bono_price': '1200'
+            }
+        )
+        bono_name = response.json().get('bono_name')
+        bono_url = response.json().get('url')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(bono_name, 'test_buy_bonds')
+        response = client.get(bono_url + 'comprabono/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.json(),
+            {"error": "failed to buy own product"})
+        response = client.get(bono_url)
+        bought_by = response.json().get('bought_by')
+        self.assertEqual(bought_by, None)
+        client.logout()
+        # client = APIClient()
+        client.login(username='testuser2', password='testpassword2')
+        response = client.get(bono_url + 'comprabono/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(
+            response.json(),
+            {"buy": "success"})
+        response = client.get(bono_url + 'comprabono/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(
+            response.json(),
+            {"error": "Not available already sold"})
+        response = client.get(bono_url)
+        bought_by = response.json().get('bought_by')
+        self.assertNotEqual(bought_by, None)
+
+    def _is_float(self, str):
+        try:
+            float(str)
+            return True
+        except ValueError:
+            return False
+
+    def test_external_api(self):
+        client = APIClient()
+        client.login(username='testuser', password='testpassword')
+        response = client.post(
+            '/bonos/',
+            {
+                'bono_name': 'test_external_api',
+                'bono_number': '1',
+                'bono_price': '1200'
+            }
+        )
+        bono_name = response.json().get('bono_name')
+        bono_url = response.json().get('url')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(bono_name, 'test_external_api')
+        response = client.get(bono_url + 'preciousd/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        usd = response.json().get('USD')
+        mxn = response.json().get('MXN')
+        rate = response.json().get('RATE')
+        self.assertTrue(self._is_float(usd))
+        self.assertTrue(self._is_float(mxn))
+        self.assertTrue(self._is_float(rate))
+
